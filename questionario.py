@@ -167,8 +167,8 @@ st.set_page_config(
 # ===============================
 col_logo, col_title = st.columns([1, 4])
 
-with col_logo:
-    st.image("confartigianato_logo.jpeg", width=120)
+# with col_logo:
+#     st.image("confartigianato_logo.jpeg", width=120)
 
 with col_title:
     st.title("Questionario di Autovalutazione Digitale")

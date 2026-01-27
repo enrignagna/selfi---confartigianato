@@ -183,7 +183,7 @@ st.markdown(
     <style>
     /* Titoli */
     h1, h2, h3 {
-        color: #c00000;
+        color: f{BLU_CONF};
     }
 
     /* Sidebar */

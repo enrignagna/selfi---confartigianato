@@ -1,8 +1,4 @@
 import streamlit as st
-from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer
-from reportlab.lib.styles import getSampleStyleSheet
-from reportlab.lib.pagesizes import A4
-from reportlab.lib.units import cm
 
 st.set_page_config(
     page_title="Questionario di autovalutazione",

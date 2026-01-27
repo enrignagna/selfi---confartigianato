@@ -89,7 +89,7 @@ def genera_pdf_report(risposte):
     # COPERTINA
     # ===============================
     try:
-        logo = Image("confartigianato_logo.jpeg", width=6*cm, height=3*cm)
+        logo = Image("confartigianato-logo.jpeg", width=6*cm, height=3*cm)
         logo.hAlign = "CENTER"
         story.append(logo)
         story.append(Spacer(1, 30))
@@ -167,8 +167,8 @@ st.set_page_config(
 # ===============================
 col_logo, col_title = st.columns([1, 4])
 
-# with col_logo:
-#     st.image("confartigianato_logo.jpeg", width=120)
+with col_logo:
+    st.image("confartigianato-logo.jpeg", width=120)
 
 with col_title:
     st.title("Questionario di Autovalutazione Digitale")

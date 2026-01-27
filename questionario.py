@@ -34,7 +34,7 @@ def genera_pdf_report(risposte):
     # Nome file con ragione sociale
     ragione_sociale = risposte.get("ragione_sociale", "impresa")
     nome_base = nome_file_sicuro(ragione_sociale)
-    file_path = f"report_autovalutazione_{nome_base}.pdf"
+    file_path = f"report_valutazione_{nome_base}.pdf"
 
     doc = SimpleDocTemplate(
         file_path,
@@ -97,7 +97,7 @@ def genera_pdf_report(risposte):
         pass  # se il logo non viene trovato, il PDF viene comunque generato
 
     story.append(Paragraph(
-        "Questionario di Autovalutazione Digitale",
+        "Questionario di Valutazione Digitale",
         styles["TitoloConf"]
     ))
 
@@ -143,7 +143,7 @@ def genera_pdf_report(risposte):
         canvas.drawCentredString(
             A4[0] / 2,
             1.5 * cm,
-            "© Confartigianato – Report di autovalutazione digitale"
+            "© Confartigianato – Report di valutazione digitale"
         )
         canvas.restoreState()
 
@@ -158,7 +158,7 @@ def genera_pdf_report(risposte):
 # ===============================   
 
 st.set_page_config(
-    page_title="Questionario di autovalutazione",
+    page_title="Questionario di valutazione",
     layout="centered"
 )
 
@@ -171,7 +171,7 @@ with col_logo:
     st.image("confartigianato-logo.jpeg", width=120)
 
 with col_title:
-    st.title("Questionario di Autovalutazione Digitale")
+    st.title("Questionario di Valutazione Digitale")
     st.caption(
         "Sistema di assessment per la digitalizzazione, l’innovazione e la sostenibilità delle imprese"
     )
@@ -601,7 +601,7 @@ elif pagina == "Report finale":
     st.download_button(
         "Scarica report testuale",
         data=report_txt,
-        file_name="report_autovalutazione.txt",
+        file_name="report_valutazione.txt",
         mime="text/plain"
     )
 

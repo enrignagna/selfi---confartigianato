@@ -229,6 +229,7 @@ pagine = [
     "8. Realizzazione prodotto / servizio",
     "9. Sostenibilità ambientale",
     "10. Conclusione",
+    "Digital Intensity Index 2024",
     "Report finale"
 ]
 
@@ -582,6 +583,94 @@ elif pagina == "10. Conclusione":
         "Note aggiuntive – Conclusione",
         r.get("note_conclusione", "")
     )   
+
+elif pagina == "Digital Intensity Index 2024":
+
+    st.header("Digital Intensity Index 2024")
+
+    st.markdown(
+        "Le seguenti domande fanno riferimento agli indicatori ufficiali "
+        "del Digital Intensity Index (DII) utilizzati a livello europeo."
+    )
+
+    r["dii_addetti_connessi"] = st.radio(
+        "1. Gli addetti che lavorano connessi alla rete sono più del 50%?",
+        ["Sì", "No"]
+    )
+
+    r["dii_ai"] = st.radio(
+        "2. L’impresa utilizza tecnologie di Intelligenza Artificiale (qualsiasi)?",
+        ["Sì", "No"]
+    )
+
+    r["dii_banda_larga"] = st.radio(
+        "3. Connessione Internet fissa con velocità di download ≥ 30 Mbit/s?",
+        ["Sì", "No"]
+    )
+
+    r["dii_analisi_dati"] = st.radio(
+        "4. L’impresa realizza analisi dei dati per modelli, previsioni e supporto decisionale?",
+        ["Sì", "No"]
+    )
+
+    st.subheader("Cloud computing")
+
+    st.markdown(
+        """
+        **Cloud di base**: posta elettronica, PEC, software per ufficio, archiviazione file  
+        **Cloud intermedio**: software di finanza/contabilità, ERP, CRM  
+        **Cloud sofisticato**: hosting database, piattaforme per sviluppo e test applicazioni
+        """
+    )
+
+    r["dii_cloud_base"] = st.radio(
+        "5. L’impresa acquista servizi di cloud computing?",
+        ["Sì", "No"]
+    )
+
+    r["dii_cloud_intermedio_avanzato"] = st.radio(
+        "6. L’impresa acquista servizi di cloud computing intermedi o sofisticati?",
+        ["Sì", "No"]
+    )
+
+    st.subheader("Social media e sistemi gestionali")
+
+    r["dii_social_media"] = st.radio(
+        "7. L’impresa utilizza almeno un social media?",
+        ["Sì", "No"]
+    )
+
+    r["dii_erp"] = st.radio(
+        "8. L’impresa utilizza un ERP per condividere informazioni tra aree funzionali?",
+        ["Sì", "No"]
+    )
+
+    r["dii_crm"] = st.radio(
+        "9. L’impresa dispone di un CRM?",
+        ["Sì", "No"]
+    )
+
+    r["dii_due_social"] = st.radio(
+        "10. L’impresa utilizza almeno due social media?",
+        ["Sì", "No"]
+    )
+
+    st.subheader("Vendite online")
+
+    r["dii_vendite_online_1"] = st.radio(
+        "11. Le vendite online sono ≥ 1% dei ricavi totali?",
+        ["Sì", "No"]
+    )
+
+    r["dii_vendite_b2c"] = st.radio(
+        "12. Le vendite via web sono > 1% dei ricavi e il B2C è > 10% delle vendite online?",
+        ["Sì", "No"]
+    )
+
+    r["note_dii"] = st.text_area(
+        "Note aggiuntive – Digital Intensity Index",
+        r.get("note_dii", "")
+    )
 
 # ===============================
 # REPORT FINALE

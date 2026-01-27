@@ -28,7 +28,7 @@ def nome_file_sicuro(testo):
 
 
 BLU_CONF = HexColor("#1170d0")
-GRIGIO_TESTO = HexColor("#d3d6da")
+GRIGIO_TESTO = HexColor("#050F1B")
 
 def genera_pdf_report(risposte):
     # Nome file con ragione sociale

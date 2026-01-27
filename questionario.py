@@ -667,11 +667,6 @@ elif pagina == "Digital Intensity Index 2024":
         ["Sì", "No"]
     )
 
-    r["note_dii"] = st.text_area(
-        "Note aggiuntive – Digital Intensity Index",
-        r.get("note_dii", "")
-    )
-
 # ===============================
 # REPORT FINALE
 # ===============================

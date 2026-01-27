@@ -3,12 +3,38 @@ from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer
 from reportlab.lib.styles import getSampleStyleSheet
 from reportlab.lib.pagesizes import A4
 from reportlab.lib.units import cm
+from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, Image, PageBreak
+from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
+from reportlab.lib.pagesizes import A4
+from reportlab.lib.units import cm
+from reportlab.lib.colors import HexColor
+import re
+
+def nome_file_sicuro(testo):
+    """
+    Converte una stringa in un nome file sicuro:
+    - minuscole
+    - spazi -> _
+    - rimuove caratteri non validi
+    """
+    testo = testo.lower().strip()
+    testo = testo.replace(" ", "_")
+    testo = re.sub(r"[^a-z0-9_]", "", testo)
+    return testo
 
 
 
+
+
+
+BLU_CONF = HexColor("#1170d0")
+GRIGIO_TESTO = HexColor("#d3d6da")
 
 def genera_pdf_report(risposte):
-    file_path = "report_autovalutazione.pdf"
+    # Nome file con ragione sociale
+    ragione_sociale = risposte.get("ragione_sociale", "impresa")
+    nome_base = nome_file_sicuro(ragione_sociale)
+    file_path = f"report_autovalutazione_{nome_base}.pdf"
 
     doc = SimpleDocTemplate(
         file_path,
@@ -20,38 +46,111 @@ def genera_pdf_report(risposte):
     )
 
     styles = getSampleStyleSheet()
+
+    # --- STILI PERSONALIZZATI ---
+    styles.add(ParagraphStyle(
+        name="TitoloConf",
+        fontSize=20,
+        leading=24,
+        textColor=BLU_CONF,
+        spaceAfter=20,
+        alignment=1  # center
+    ))
+
+    styles.add(ParagraphStyle(
+        name="SottotitoloConf",
+        fontSize=12,
+        leading=14,
+        textColor=GRIGIO_TESTO,
+        spaceAfter=30,
+        alignment=1
+    ))
+
+    styles.add(ParagraphStyle(
+        name="SezioneConf",
+        fontSize=14,
+        leading=18,
+        textColor=BLU_CONF,
+        spaceBefore=20,
+        spaceAfter=10
+    ))
+
+    styles.add(ParagraphStyle(
+        name="TestoConf",
+        fontSize=10,
+        leading=14,
+        textColor=GRIGIO_TESTO,
+        spaceAfter=6
+    ))
+
     story = []
 
-    # Titolo
-    story.append(Paragraph("<b>Questionario di autovalutazione</b>", styles["Title"]))
-    story.append(Spacer(1, 12))
+    # ===============================
+    # COPERTINA
+    # ===============================
+    try:
+        logo = Image("confartigianato_logo.jpeg", width=6*cm, height=3*cm)
+        logo.hAlign = "CENTER"
+        story.append(logo)
+        story.append(Spacer(1, 30))
+    except:
+        pass  # se il logo non viene trovato, il PDF viene comunque generato
 
-    # Ragione sociale (se presente)
-    if "ragione_sociale" in risposte:
-        story.append(
-            Paragraph(f"<b>Impresa:</b> {risposte.get('ragione_sociale', '')}", styles["Normal"])
-        )
-        story.append(Spacer(1, 12))
+    story.append(Paragraph(
+        "Questionario di Autovalutazione Digitale",
+        styles["TitoloConf"]
+    ))
 
-    # Contenuto
+    story.append(Paragraph(
+        "Digitalizzazione, innovazione e sostenibilità delle imprese",
+        styles["SottotitoloConf"]
+    ))
+
+    if ragione_sociale:
+        story.append(Paragraph(
+            f"<b>Impresa:</b> {ragione_sociale}",
+            styles["TestoConf"]
+        ))
+
+    story.append(PageBreak())
+
+    # ===============================
+    # CONTENUTO DEL REPORT
+    # ===============================
     for chiave, valore in risposte.items():
         titolo = chiave.replace("_", " ").capitalize()
-        story.append(Paragraph(f"<b>{titolo}</b>", styles["Heading3"]))
 
-        if isinstance(valore, list):
-            for v in valore:
-                story.append(Paragraph(f"- {v}", styles["Normal"]))
-        elif isinstance(valore, dict):
+        story.append(Paragraph(titolo, styles["SezioneConf"]))
+
+        if isinstance(valore, dict):
             for k, v in valore.items():
-                story.append(Paragraph(f"{k}: {v}", styles["Normal"]))
+                story.append(Paragraph(f"<b>{k}</b>: {v}", styles["TestoConf"]))
+
+        elif isinstance(valore, list):
+            for v in valore:
+                story.append(Paragraph(f"- {v}", styles["TestoConf"]))
+
         else:
-            story.append(Paragraph(str(valore), styles["Normal"]))
+            story.append(Paragraph(str(valore), styles["TestoConf"]))
 
-        story.append(Spacer(1, 10))
+    # ===============================
+    # FOOTER ISTITUZIONALE
+    # ===============================
+    def footer(canvas, doc):
+        canvas.saveState()
+        canvas.setFont("Helvetica", 8)
+        canvas.setFillColor(GRIGIO_TESTO)
+        canvas.drawCentredString(
+            A4[0] / 2,
+            1.5 * cm,
+            "© Confartigianato – Report di autovalutazione digitale"
+        )
+        canvas.restoreState()
 
-    doc.build(story)
+    doc.build(story, onFirstPage=footer, onLaterPages=footer)
 
     return file_path
+    
 
 
 # ===============================
@@ -62,6 +161,51 @@ st.set_page_config(
     page_title="Questionario di autovalutazione",
     layout="centered"
 )
+
+# ===============================
+# HEADER CON LOGO CONFARTIGIANATO
+# ===============================
+col_logo, col_title = st.columns([1, 4])
+
+with col_logo:
+    st.image("confartigianato_logo.jpeg", width=120)
+
+with col_title:
+    st.title("Questionario di Autovalutazione Digitale")
+    st.caption(
+        "Sistema di assessment per la digitalizzazione, l’innovazione e la sostenibilità delle imprese"
+    )
+
+st.divider()
+
+st.markdown(
+    """
+    <style>
+    /* Titoli */
+    h1, h2, h3 {
+        color: #c00000;
+    }
+
+    /* Sidebar */
+    section[data-testid="stSidebar"] {
+        background-color: #f5f5f5;
+    }
+
+    /* Bottoni */
+    button {
+        border-radius: 6px;
+        font-weight: 600;
+    }
+
+    /* Text area */
+    textarea {
+        border-radius: 6px;
+    }
+    </style>
+    """,
+    unsafe_allow_html=True
+)
+
 
 # ===============================
 # STATO GLOBALE
@@ -471,6 +615,6 @@ elif pagina == "Report finale":
             st.download_button(
                 "Scarica report PDF",
                 data=f,
-                file_name="report_autovalutazione.pdf",
+                file_name=pdf_path,
                 mime="application/pdf"
             )

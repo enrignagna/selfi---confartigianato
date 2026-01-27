@@ -1,4 +1,62 @@
 import streamlit as st
+from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer
+from reportlab.lib.styles import getSampleStyleSheet
+from reportlab.lib.pagesizes import A4
+from reportlab.lib.units import cm
+
+
+
+
+def genera_pdf_report(risposte):
+    file_path = "report_autovalutazione.pdf"
+
+    doc = SimpleDocTemplate(
+        file_path,
+        pagesize=A4,
+        rightMargin=2*cm,
+        leftMargin=2*cm,
+        topMargin=2*cm,
+        bottomMargin=2*cm
+    )
+
+    styles = getSampleStyleSheet()
+    story = []
+
+    # Titolo
+    story.append(Paragraph("<b>Questionario di autovalutazione</b>", styles["Title"]))
+    story.append(Spacer(1, 12))
+
+    # Ragione sociale (se presente)
+    if "ragione_sociale" in risposte:
+        story.append(
+            Paragraph(f"<b>Impresa:</b> {risposte.get('ragione_sociale', '')}", styles["Normal"])
+        )
+        story.append(Spacer(1, 12))
+
+    # Contenuto
+    for chiave, valore in risposte.items():
+        titolo = chiave.replace("_", " ").capitalize()
+        story.append(Paragraph(f"<b>{titolo}</b>", styles["Heading3"]))
+
+        if isinstance(valore, list):
+            for v in valore:
+                story.append(Paragraph(f"- {v}", styles["Normal"]))
+        elif isinstance(valore, dict):
+            for k, v in valore.items():
+                story.append(Paragraph(f"{k}: {v}", styles["Normal"]))
+        else:
+            story.append(Paragraph(str(valore), styles["Normal"]))
+
+        story.append(Spacer(1, 10))
+
+    doc.build(story)
+
+    return file_path
+
+
+# ===============================
+# CONFIGURAZIONE PAGINA
+# ===============================   
 
 st.set_page_config(
     page_title="Questionario di autovalutazione",
@@ -388,15 +446,31 @@ elif pagina == "Report finale":
 
     st.header("Report finale")
 
-    report = ""
+    # -------- REPORT TESTUALE --------
+    report_txt = ""
     for k, v in r.items():
-        report += f"{k}: {v}\n"
+        report_txt += f"{k}: {v}\n"
 
-    st.text_area("Anteprima report", report, height=400)
+    st.subheader("Report testuale")
+    st.text_area("Anteprima", report_txt, height=300)
 
     st.download_button(
-        "Scarica report",
-        data=report,
+        "Scarica report testuale",
+        data=report_txt,
         file_name="report_autovalutazione.txt",
         mime="text/plain"
     )
+
+    # -------- REPORT PDF --------
+    st.subheader("Report PDF")
+
+    if st.button("Genera report PDF"):
+        pdf_path = genera_pdf_report(r)
+
+        with open(pdf_path, "rb") as f:
+            st.download_button(
+                "Scarica report PDF",
+                data=f,
+                file_name="report_autovalutazione.pdf",
+                mime="application/pdf"
+            )

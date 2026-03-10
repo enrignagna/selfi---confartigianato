@@ -256,12 +256,13 @@ if pagina == "1. Anagrafica":
     r["ragione_sociale"] = st.text_input("Ragione sociale", r.get("ragione_sociale", ""))
     r["forma_societaria"] = st.radio(
         "Forma societaria",
-        ["SRL", "SPA", "SRLs", "Sapa", "SNC", "SAS", "S.s.", "Società cooperativa", "Società consortile", "Altro"]
+        ["SRL", "SPA", "SRLs", "Sapa", "SNC", "SAS", "S.s.", "Società cooperativa", "Società consortile", "Ditta individuale", "Libero professionista" , "Associazione", "Fondazione", "Altro"]
     )
     r["piva_cf"] = st.text_input("Codice fiscale / Partita IVA", r.get("piva_cf", ""))
     r["email_principale"] = st.text_input("Email principale", r.get("email_principale", ""))
-    r["email_secondaria"] = st.text_input("Email secondaria", r.get("email_secondaria", ""))
+    r["comune"] = st.text_input("Comune", r.get("comune", ""))
     r["provincia"] = st.text_input("Provincia", r.get("provincia", ""))
+    r["regione"] = st.text_input("Regione", r.get("regione", ""))
     r["telefono"] = st.text_input("Telefono", r.get("telefono", ""))
     r["nome_compilatore"] = st.text_input("Nome compilatore", r.get("nome_compilatore", ""))
     r["cognome_compilatore"] = st.text_input("Cognome compilatore", r.get("cognome_compilatore", ""))
@@ -271,7 +272,7 @@ if pagina == "1. Anagrafica":
         "Sedi / stabilimenti",
         ["Unica sede", "Più sedi – valutazione globale", "Più sedi – valutazione per sede indicata"]
     )
-
+    r["codice_ateco"] = st.text_input("Codice ATECO", r.get("codice_ateco", ""))
     r["settore"] = st.radio(
         "Settore prevalente",
         [
@@ -283,12 +284,12 @@ if pagina == "1. Anagrafica":
         ]
     )
 
-    r["addetti"] = st.radio("Numero addetti", ["0-9", "10-49", "50-249", "250-499", ">=500"])
+    r["addetti"] = st.radio("Numero addetti", ["0-9 ", "10-49", "50-249", ">=250"])
     r["fatturato"] = st.radio(
         "Fatturato ultimo anno",
         ["<500k", "500k-1M", "1-2M", "2-5M", "5-10M", "10-25M", "25-50M", "50-100M", ">100M"]
     )
-    r["mercato"] = st.radio("Tipo di mercato", ["B2C", "B2B"])
+    r["mercato"] = st.radio("Tipo di mercato", ["B2C", "B2B", "Entrambi"])
 
     # >>> AGGIUNTA NOTE
     r["note_anagrafica"] = st.text_area("Note aggiuntive – Anagrafica", r.get("note_anagrafica", ""))
@@ -302,16 +303,49 @@ elif pagina == "2. Contabilità e Finanza":
     st.header("2. Contabilità, Finanza e Processi decisionali")
 
     r["contabilita_finanza"] = st.radio("Gestione contabilità e finanza", scala_maturita)
-    r["processi_decisionali"] = st.radio(
-        "Processi decisionali",
+    r["strumenti_amministrativi"] = st.multiselect(
+        "Quali strumenti digitali vengono utilizzati per la gestione amministrativa?",
         [
-            "Basati sull’esperienza",
-            "Basati su opportunità e concorrenti",
-            "Strategia + dati di mercato",
-            "Strategia + dati di mercato e interni",
-            "Strategia proattiva e continua"
+            "Fogli Excel",
+            "Software gestionale contabile",
+            "ERP aziendale",
+            "Portale fatturazione elettronica",
+            "Gestione documentale digitale",
+            "Integrazione con banca / pagamenti digitali",
+            "Nessuno strumento digitale specifico"
         ]
     )
+    r["processi_decisionali"] = st.radio(
+        "Su cosa si basano principalmente le decisioni aziendali?",
+        [
+            "Esperienza e intuizione",
+            "Osservazione di opportunità e concorrenti",
+            "Strategia supportata da dati di mercato",
+            "Strategia supportata da dati di mercato e dati interni",
+            "Strategia proattiva basata su analisi continua dei dati"
+        ]
+    )
+    r["gestione_contabilita"] = st.radio(
+        "Come viene gestita la contabilità aziendale?",
+        [
+            "Internamente",
+            "Internamente con supporto esterno",
+            "Studio esterno",
+            "Confartigianato"
+        ]
+    )
+
+    if r["gestione_contabilita"] == "Confartigianato":
+        r["confartigianato_servizio"] = st.multiselect(
+            "Quali servizi sono gestiti da Confartigianato?",
+            [
+                "Contabilità",
+                "Paghe",
+                "Consulenza fiscale",
+                "Supporto gestionale",
+                "Nessuno"
+            ]
+        )
 
     r["note_contabilita"] = st.text_area(
         "Note aggiuntive – Contabilità e Finanza",
@@ -325,6 +359,64 @@ elif pagina == "2. Contabilità e Finanza":
 elif pagina == "3. Clienti e Mercati":
 
     st.header("3. Clienti e Mercati")
+
+
+    r["gestione_clienti"] = st.radio(
+        "Come vengono gestite le informazioni sui clienti?",
+        [
+            "Non esiste una gestione strutturata",
+            "Informazioni sparse (email, rubriche, fogli Excel)",
+            "Database clienti organizzato",
+            "Software gestionale o CRM",
+            "Sistema CRM integrato con altri sistemi aziendali"
+        ]
+    )
+
+    r["strumenti_clienti"] = st.multiselect(
+        "Quali strumenti utilizzate per gestire i clienti?",
+        [
+            "Fogli Excel",
+            "Software gestionale aziendale",
+            "CRM",
+            "Piattaforme di email marketing",
+            "Strumenti di assistenza clienti (ticketing)",
+            "Nessuno strumento specifico"
+        ]
+    )
+
+    r["presenza_digitale"] = st.multiselect(
+        "Quali canali digitali utilizza l'azienda per comunicare con il mercato?",
+        [
+            "Sito web aziendale",
+            "E-commerce",
+            "Social media",
+            "Newsletter",
+            "Marketplace online",
+            "Nessun canale digitale"
+        ]
+    )
+
+    r["uso_dati_clienti"] = st.radio(
+        "Come vengono utilizzati i dati dei clienti?",
+        [
+            "Non vengono raccolti o analizzati",
+            "Raccolti ma usati raramente",
+            "Utilizzati per alcune decisioni commerciali",
+            "Analizzati regolarmente",
+            "Utilizzati in modo sistematico per strategie commerciali"
+        ]
+    )
+
+    r["analisi_mercato"] = st.radio(
+        "Come l'azienda monitora il mercato e i concorrenti?",
+        [
+            "Non viene effettuato monitoraggio",
+            "Monitoraggio informale",
+            "Analisi occasionali",
+            "Analisi periodiche",
+            "Monitoraggio continuo con strumenti digitali"
+        ]
+    )
 
     r["marketing"] = st.radio("Marketing", scala_maturita)
     r["vendite"] = st.radio("Vendite", scala_maturita)
@@ -341,17 +433,44 @@ elif pagina == "3. Clienti e Mercati":
 # ===============================
 elif pagina == "4. Tecnologie":
 
-    st.header("4. Tecnologie")
+    st.header("4. Tecnologie e Innovazione")
 
-    r["sistemi_informativi"] = st.radio("Sistemi informativi", scala_maturita)
-    r["ricerca_sviluppo"] = st.radio("Ricerca e sviluppo (livello generale)", scala_maturita)
+    r["sistemi_informativi"] = st.radio(
+        "Livello di digitalizzazione e integrazione dei sistemi informativi aziendali",
+        scala_maturita
+    )
+
+    r["ricerca_sviluppo"] = st.radio(
+        "Livello generale delle attività di ricerca, sviluppo e innovazione",
+        scala_maturita
+    )
+
+    # >>> AGGIUNTA: STRATEGIA DIGITALE
+    r["strategia_digitale"] = st.radio(
+        "L'impresa ha una strategia digitale o di innovazione formalizzata?",
+        [
+            "No",
+            "In fase di definizione",
+            "Sì, ma non formalizzata",
+            "Sì, formalizzata",
+            "Sì, formalizzata e monitorata con KPI"
+        ]
+    )
 
     r["proprieta_intellettuale"] = st.multiselect(
-        "Proprietà intellettuale",
-        ["Brevetti", "Modelli", "Disegni", "Marchi", "Nessuna"]
+        "Proprietà intellettuale posseduta dall'impresa",
+        [
+            "Brevetti",
+            "Modelli di utilità",
+            "Disegni industriali",
+            "Marchi registrati",
+            "Nessuna"
+        ]
     )
 
     # ---------- TECNOLOGIE ----------
+    st.subheader("Tecnologie adottate o previste")
+
     tecnologie = [
         "AI", "Blockchain", "Robotica", "Stampa 3D", "AR/VR", "Simulazione",
         "IoT", "Cloud", "Cybersicurezza", "Big Data", "CAD/CAM",
@@ -406,7 +525,7 @@ elif pagina == "4. Tecnologie":
     )
 
     r["rd_digitale"] = st.radio(
-        "Supporto del digitale alle attività di R&D",
+        "Utilizzo di strumenti digitali nelle attività di ricerca e sviluppo",
         [
             "Nessun supporto digitale",
             "Strumenti di base",
@@ -427,7 +546,7 @@ elif pagina == "4. Tecnologie":
         ]
     )
 
-    # >>> AGGIUNTA: PROGETTI FUTURI R&D
+    # >>> PROGETTI FUTURI R&D
     r["rd_progetti_futuri"] = st.text_area(
         "Progetti e idee future in ambito R&D",
         r.get("rd_progetti_futuri", "")
@@ -439,15 +558,11 @@ elif pagina == "4. Tecnologie":
     )
 
 
-# ===============================
-# 5–10: NOTE FINALI PER OGNI SEZIONE
-# ===============================
-# (le altre sezioni restano IDENTICHE, con sola aggiunta delle note)
 
 # 5. Risorse Umane
 elif pagina == "5. Risorse Umane":
     st.header("5. Risorse Umane")
-    r["gestione_personale"] = st.radio("Gestione del personale", scala_maturita)
+    r["gestione_personale"] = st.radio("Digitalizzazione dei processi di gestione del personale", scala_maturita)
     r["responsabile_digitale"] = st.radio("Responsabile trasformazione digitale", ["No", "No, ma sarà nominato", "Sì"])
     r["formazione_40"] = st.radio("Formazione Impresa 4.0", ["Già svolta", "Prevista entro 12 mesi", "Non valutata"])
     if r["formazione_40"] != "Non valutata":
@@ -484,7 +599,7 @@ elif pagina == "7. Logistica":
     if r["logistica_applicabile"] == "Sì":
         r["logistica_interna"] = st.radio("Logistica interna", scala_maturita)
         r["logistica_esterna"] = st.radio("Logistica esterna", scala_maturita)
-        r["tracciabilita"] = st.radio("Tracciabilità e magazzino", scala_maturita)
+        r["tracciabilita"] = st.radio("Tracciabilità dei materiali e gestione del magazzino", scala_maturita)
     r["note_logistica"] = st.text_area(
         "Note aggiuntive – Logistica",
         r.get("note_logistica", "")
@@ -497,7 +612,7 @@ elif pagina == "8. Realizzazione prodotto / servizio":
 
     st.header("8. Realizzazione prodotto / servizio")
 
-    r["produzione_servizi"] = st.radio("Produzione / erogazione", scala_maturita)
+    r["produzione_servizi"] = st.radio("Produzione o erogazione del servizio", scala_maturita)
     r["controllo_qualita"] = st.radio("Controllo qualità", scala_maturita)
     r["manutenzione"] = st.radio("Manutenzione", scala_maturita)
     r["note_realizzazione"] = st.text_area(
@@ -540,7 +655,7 @@ elif pagina == "9. Sostenibilità ambientale":
                 "Altro"
             ]
         )
-    if "Altro" in r["risultati_sostenibilita"]:
+    if r.get("risultati_sostenibilita") and "Altro" in r["risultati_sostenibilita"]:
         r["risultati_sostenibilita_altro"] = st.text_input("Specificare altro")     
     r["note_sostenibilita"] = st.text_area(
         "Note aggiuntive – Sostenibilità ambientale",
@@ -565,7 +680,7 @@ elif pagina == "10. Conclusione":
         ]
     )
 
-    if "Altro" in r["servizi_cciaa"]:
+    if r.get("servizi_cciaa") and "Altro" in r["servizi_cciaa"]:
         r["servizi_cciaa_altro"] = st.text_input("Specificare altro")
     r["interesse_servizi"] = st.multiselect(
         "Servizi CCIAA di interesse",

@@ -1,3 +1,6 @@
+import os
+import math
+import matplotlib.pyplot as plt
 import streamlit as st
 from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer
 from reportlab.lib.styles import getSampleStyleSheet
@@ -228,8 +231,7 @@ pagine = [
     "7. Logistica",
     "8. Realizzazione prodotto / servizio",
     "9. Sostenibilità ambientale",
-    "10. Conclusione",
-    "Digital Intensity Index 2024",
+    "Digital Intensity Index",
     "Report finale"
 ]
 
@@ -662,46 +664,9 @@ elif pagina == "9. Sostenibilità ambientale":
         r.get("note_sostenibilita", "")
     )
 
-# ===============================
-# 10. CONCLUSIONE
-# ===============================
-elif pagina == "10. Conclusione":
+elif pagina == "Digital Intensity Index":
 
-    st.header("10. Conclusione")
-
-    r["servizi_cciaa"] = st.multiselect(
-        "Servizi CCIAA utilizzati",
-        [
-            "Eventi/corsi digitali",
-            "Alternanza scuola-lavoro",
-            "Internazionalizzazione",
-            "Servizi digitali",
-            "Altro"
-        ]
-    )
-
-    if r.get("servizi_cciaa") and "Altro" in r["servizi_cciaa"]:
-        r["servizi_cciaa_altro"] = st.text_input("Specificare altro")
-    r["interesse_servizi"] = st.multiselect(
-        "Servizi CCIAA di interesse",
-        [   
-            "Eventi/corsi digitali",
-            "Alternanza scuola-lavoro",
-            "Internazionalizzazione",
-            "Servizi digitali",
-            "Altro"
-        ]
-    )  
-    if "Altro" in r["interesse_servizi"]:
-        r["interesse_servizi_altro"] = st.text_input("Specificare altro")     
-    r["note_conclusione"] = st.text_area(
-        "Note aggiuntive – Conclusione",
-        r.get("note_conclusione", "")
-    )   
-
-elif pagina == "Digital Intensity Index 2024":
-
-    st.header("Digital Intensity Index 2024")
+    st.header("Digital Intensity Index")
 
     st.markdown(
         "Le seguenti domande fanno riferimento agli indicatori ufficiali "

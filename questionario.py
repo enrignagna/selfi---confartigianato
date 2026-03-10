@@ -89,7 +89,7 @@ def genera_pdf_report(risposte):
     # COPERTINA
     # ===============================
     try:
-        logo = Image("dih-logo.jpg", width=6*cm, height=3*cm)
+        logo = Image("images/dih-logo.jpg", width=6*cm, height=3*cm)
         logo.hAlign = "CENTER"
         story.append(logo)
         story.append(Spacer(1, 30))
@@ -168,7 +168,7 @@ st.set_page_config(
 col_logo, col_title = st.columns([1, 4])
 
 with col_logo:
-    st.image("dih-logo.jpg", width=120)
+    st.image("images/dih-logo.jpg", width=120)
 
 with col_title:
     st.title("Questionario di Valutazione Digitale")

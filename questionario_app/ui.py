@@ -4,7 +4,7 @@ import streamlit as st
 
 from questionario_app.assessment import calcola_indici_assessment
 from questionario_app.constants import BLU_CONF_HEX, PAGINE, SCALA_MATURITA, TECNOLOGIE_OPZIONI
-from questionario_app.reporting import genera_pdf_report, genera_radar_chart
+from questionario_app.reporting import ensure_output_dir, genera_pdf_report, genera_radar_chart
 
 
 def configure_page():
@@ -121,25 +121,29 @@ def render_anagrafica(risposte):
         "settore",
         "Settore prevalente",
         [
-            "A Agricoltura",
-            "B Estrazione",
-            "C Manifatturiero",
-            "D Energia",
-            "E Acqua e rifiuti",
-            "F Costruzioni",
-            "G Commercio",
-            "H Trasporto",
-            "I Alloggio e ristorazione",
-            "J Informazione",
-            "K Finanza",
-            "L Immobiliare",
-            "M Professionali",
-            "N Supporto imprese",
-            "O PA",
-            "P Istruzione",
-            "Q Sanita",
-            "R Attivita artistiche",
-            "S Altri servizi",
+            "Agricoltura",
+            "Estrazione",
+            "Manifatturiero",
+            "Energia",
+            "Acqua e rifiuti",
+            "Costruzioni",
+            "Commercio",
+            "Trasporto",
+            "Alloggio e ristorazione",
+            "Informazione",
+            "Finanza",
+            "Immobiliare",
+            "Professionali",
+            "Supporto imprese",
+            "PA",
+            "Istruzione",
+            "Sanita",
+            "Attivita artistiche",
+            "Servizi",
+            "ICT",
+            "Benessere",
+            "Impianti",
+            "Altri servizi",
         ],
     )
     radio_field(risposte, "addetti", "Numero addetti", ["0-9", "10-49", "50-249", ">=250"])
@@ -154,8 +158,8 @@ def render_anagrafica(risposte):
 
 
 def render_contabilita(risposte):
-    st.header("2. Contabilita, Finanza e Processi decisionali")
-    radio_field(risposte, "contabilita_finanza", "Gestione contabilita e finanza", SCALA_MATURITA)
+    st.header("2. Servizi Tradizionali")
+    radio_field(risposte, "servizi_tradizionali", "Gestione servizi tradizionali", SCALA_MATURITA)
     multiselect_field(
         risposte,
         "strumenti_amministrativi",
@@ -184,39 +188,28 @@ def render_contabilita(risposte):
     )
     radio_field(
         risposte,
-        "gestione_contabilita",
-        "Come viene gestita la contabilita aziendale?",
-        ["Internamente", "Internamente con supporto esterno", "Studio esterno", "Confartigianato"],
+        "gestione_attivita",
+        "Come viene gestita l'attività aziendale?",
+        ["Internamente", "Internamente con supporto esterno", "Studio esterno"],
     )
-    if risposte["gestione_contabilita"] == "Confartigianato":
-        multiselect_field(
-            risposte,
-            "confartigianato_servizio",
-            "Quali servizi sono gestiti da Confartigianato?",
-            ["Contabilita", "Paghe", "Consulenza fiscale", "Supporto gestionale", "Nessuno"],
-        )
+    multiselect_field(
+        risposte,
+        "confartigianato_servizio",
+        "Quali servizi sono gestiti da Confartigianato?",
+        ["Sicurezza", "Energia", "Contabilita", "Paghe", "Consulenza finanziaria", "Supporto gestionale", "Credito", "Nessuno"],
+    )
     text_area_field(risposte, "note_contabilita", "Note aggiuntive - Contabilita e Finanza")
 
 
 def render_clienti_mercati(risposte):
     st.header("3. Clienti e Mercati")
-    radio_field(
-        risposte,
-        "gestione_clienti",
-        "Come vengono gestite le informazioni sui clienti?",
-        [
-            "Non esiste una gestione strutturata",
-            "Informazioni sparse (email, rubriche, fogli Excel)",
-            "Database clienti organizzato",
-            "Software gestionale o CRM",
-            "Sistema CRM integrato con altri sistemi aziendali",
-        ],
-    )
     multiselect_field(
         risposte,
         "strumenti_clienti",
         "Quali strumenti utilizzate per gestire i clienti?",
         [
+            "Rubrica",
+            "Email",
             "Fogli Excel",
             "Software gestionale aziendale",
             "CRM",
@@ -309,73 +302,79 @@ def render_tecnologie(risposte):
         )
 
     st.subheader("Ricerca, Sviluppo e Innovazione (R&D)")
-    radio_field(
-        risposte,
-        "rd_governance",
-        "Livello di strutturazione delle attivita di R&D",
-        [
-            "Nessuna attivita di R&D",
-            "Attivita occasionali non strutturate",
-            "Attivita strutturate senza budget",
-            "Attivita strutturate con budget",
-            "Funzione R&D formalizzata con KPI",
-        ],
-    )
-    radio_field(
-        risposte,
-        "rd_responsabile",
-        "Responsabilita R&D",
-        ["Nessuna", "Figura informale", "Figura formalmente nominata", "Team interno dedicato", "Team interno + collaborazioni esterne"],
-    )
-    radio_field(
-        risposte,
-        "rd_metodo",
-        "Metodo di generazione e selezione delle idee",
-        ["Nessun metodo", "Intuizioni informali", "Analisi di mercato", "Analisi dati interni/esterni", "Processi strutturati (design thinking, test pilota)"],
-    )
-    radio_field(
-        risposte,
-        "rd_digitale",
-        "Utilizzo di strumenti digitali nelle attivita di ricerca e sviluppo",
-        ["Nessun supporto digitale", "Strumenti di base", "Software specialistici (CAD, simulazione, PLM)", "Integrazione con sistemi aziendali", "Uso avanzato di dati e AI"],
-    )
-    multiselect_field(
+    radio_field(risposte, "rd_applicabile", "La Ricerca e Sviluppo si applica?", ["Si", "No"])
+    if risposte["rd_applicabile"] == "Si":
+        radio_field(
+            risposte,
+            "rd_governance",
+            "Livello di strutturazione delle attivita di R&D",
+            [
+                "Nessuna attivita di R&D",
+                "Attivita occasionali non strutturate",
+                "Attivita strutturate senza budget",
+                "Attivita strutturate con budget",
+                "Funzione R&D formalizzata con KPI",
+            ],
+        )
+        radio_field(
+            risposte,
+            "rd_responsabile",
+            "Responsabilita R&D",
+            ["Nessuna", "Figura informale", "Figura formalmente nominata", "Team interno dedicato", "Team interno + collaborazioni esterne"],
+        )
+        radio_field(
+            risposte,
+            "rd_metodo",
+            "Metodo di generazione e selezione delle idee",
+            ["Nessun metodo", "Intuizioni informali", "Analisi di mercato", "Analisi dati interni/esterni", "Processi strutturati (design thinking, test pilota)"],
+        )
+        radio_field(
+            risposte,
+            "rd_digitale",
+            "Utilizzo di strumenti digitali nelle attivita di ricerca e sviluppo",
+            ["Nessun supporto digitale", "Strumenti di base", "Software specialistici (CAD, simulazione, PLM)", "Integrazione con sistemi aziendali", "Uso avanzato di dati e AI"],
+        )
+        multiselect_field(
         risposte,
         "rd_collaborazioni",
         "Collaborazioni R&D",
         ["Nessuna", "Fornitori", "Clienti", "Universita / centri di ricerca", "Startup / ecosistemi di innovazione"],
-    )
-    text_area_field(risposte, "rd_progetti_futuri", "Progetti e idee future in ambito R&D")
+        )
+        text_area_field(risposte, "rd_progetti_futuri", "Progetti e idee future in ambito R&D")
     text_area_field(risposte, "note_tecnologie", "Note aggiuntive - Tecnologie e R&D")
 
 
 def render_risorse_umane(risposte):
     st.header("5. Risorse Umane")
-    radio_field(risposte, "gestione_personale", "Digitalizzazione dei processi di gestione del personale", SCALA_MATURITA)
-    radio_field(risposte, "responsabile_digitale", "Responsabile trasformazione digitale", ["No", "No, ma sara nominato", "Si"])
-    radio_field(risposte, "formazione_40", "Formazione Impresa 4.0", ["Gia svolta", "Prevista entro 12 mesi", "Non valutata"])
-    if risposte["formazione_40"] != "Non valutata":
-        multiselect_field(
-            risposte,
-            "temi_formazione",
-            "Temi formazione",
-            ["Tecnologie hardware", "Tecnologie software", "Gestione dati", "Integrazione processi", "Altro"],
-        )
-        multiselect_field(
-            risposte,
-            "figure_formate",
-            "Figure coinvolte",
-            ["Manager", "Responsabili di processo", "Operai", "Altro"],
-        )
-    text_area_field(risposte, "note_risorse_umane", "Note aggiuntive - Risorse Umane")
+    radio_field(risposte, "hr_applicabile", "Le risorse umane si applicano?", ["Si", "No"])
+    if risposte["hr_applicabile"] == "Si":
+        radio_field(risposte, "gestione_personale", "Digitalizzazione dei processi di gestione del personale", SCALA_MATURITA)
+        radio_field(risposte, "responsabile_digitale", "Responsabile trasformazione digitale", ["No", "No, ma sara nominato", "Si"])
+        radio_field(risposte, "formazione_40", "Formazione Impresa 4.0", ["Gia svolta", "Prevista entro 12 mesi", "Non valutata"])
+        if risposte["formazione_40"] != "Non valutata":
+            multiselect_field(
+                risposte,
+                "temi_formazione",
+                "Temi formazione",
+                ["Tecnologie hardware", "Tecnologie software", "Gestione dati", "Integrazione processi", "Altro"],
+            )
+            multiselect_field(
+                risposte,
+                "figure_formate",
+                "Figure coinvolte",
+                ["Manager", "Responsabili di processo", "Operai", "Altro"],
+            )
+        text_area_field(risposte, "note_risorse_umane", "Note aggiuntive - Risorse Umane")
 
 
 def render_acquisti(risposte):
     st.header("6. Acquisti")
-    radio_field(risposte, "gestione_fornitori", "Gestione fornitori", SCALA_MATURITA)
-    radio_field(risposte, "gestione_acquisti", "Gestione acquisti", SCALA_MATURITA)
-    radio_field(risposte, "valutazione_fornitori", "Valutazione fornitori", SCALA_MATURITA)
-    text_area_field(risposte, "note_acquisti", "Note aggiuntive - Acquisti")
+    radio_field(risposte, "acquisti_applicabile", "Gli acquisti si applicano?", ["Si", "No"])
+    if risposte["acquisti_applicabile"] == "Si":
+        radio_field(risposte, "gestione_fornitori", "Gestione fornitori", SCALA_MATURITA)
+        radio_field(risposte, "gestione_acquisti", "Gestione acquisti", SCALA_MATURITA)
+        radio_field(risposte, "valutazione_fornitori", "Valutazione fornitori", SCALA_MATURITA)
+        text_area_field(risposte, "note_acquisti", "Note aggiuntive - Acquisti")
 
 
 def render_logistica(risposte):
@@ -385,15 +384,17 @@ def render_logistica(risposte):
         radio_field(risposte, "logistica_interna", "Logistica interna", SCALA_MATURITA)
         radio_field(risposte, "logistica_esterna", "Logistica esterna", SCALA_MATURITA)
         radio_field(risposte, "tracciabilita", "Tracciabilita dei materiali e gestione del magazzino", SCALA_MATURITA)
-    text_area_field(risposte, "note_logistica", "Note aggiuntive - Logistica")
+        text_area_field(risposte, "note_logistica", "Note aggiuntive - Logistica")
 
 
 def render_realizzazione(risposte):
     st.header("8. Realizzazione prodotto / servizio")
-    radio_field(risposte, "produzione_servizi", "Produzione o erogazione del servizio", SCALA_MATURITA)
-    radio_field(risposte, "controllo_qualita", "Controllo qualita", SCALA_MATURITA)
-    radio_field(risposte, "manutenzione", "Manutenzione", SCALA_MATURITA)
-    text_area_field(risposte, "note_realizzazione", "Note aggiuntive - Realizzazione prodotto / servizio")
+    radio_field(risposte, "prodotto_digitale", "Sviluppo di prodotto e/o servizio", ["Si", "No"])
+    if risposte["prodotto_digitale"] == "Si":
+        radio_field(risposte, "produzione_servizi", "Produzione o erogazione del servizio", SCALA_MATURITA)
+        radio_field(risposte, "controllo_qualita", "Controllo qualita", SCALA_MATURITA)
+        radio_field(risposte, "manutenzione", "Manutenzione", SCALA_MATURITA)
+        text_area_field(risposte, "note_realizzazione", "Note aggiuntive - Realizzazione prodotto / servizio")
 
 
 def render_sostenibilita(risposte):
@@ -461,6 +462,7 @@ def render_dii(risposte):
 def render_report_finale(risposte):
     st.header("Report finale")
     risultati = calcola_indici_assessment(risposte)
+    output_dir = ensure_output_dir()
 
     st.subheader("Risultati dell'assessment digitale")
     st.write(f"**Indice di maturita digitale complessiva:** {risultati['indice_complessivo']} / 5")
@@ -479,19 +481,23 @@ def render_report_finale(risposte):
     st.write(f"**Tecnologie presenti:** {risultati['tecnologie']['presenti']} / {risultati['tecnologie']['totale']}")
     st.write(f"**Tecnologie previste entro 3 anni:** {risultati['tecnologie']['previste']}")
 
-    radar_preview = genera_radar_chart(risultati["indici_area"], "radar_preview.png")
+    radar_preview = genera_radar_chart(
+        risultati["indici_area"],
+        os.path.join(output_dir, "radar_preview.png"),
+    )
     if radar_preview and os.path.exists(radar_preview):
         st.subheader("Radar di maturita digitale")
         st.image(radar_preview, width=600)
 
     st.subheader("Report PDF")
+    st.caption(f"I file generati vengono salvati in: `{output_dir}`")
     if st.button("Genera report PDF"):
         pdf_path = genera_pdf_report(risposte)
         with open(pdf_path, "rb") as file_handle:
             st.download_button(
                 "Scarica report PDF",
                 data=file_handle.read(),
-                file_name=pdf_path,
+                file_name=os.path.basename(pdf_path),
                 mime="application/pdf",
             )
 

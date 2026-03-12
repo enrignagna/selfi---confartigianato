@@ -6,7 +6,7 @@ GRIGIO_TESTO = HexColor("#050F1B")
 
 PAGINE = [
     "1. Anagrafica",
-    "2. Contabilita e Finanza",
+    "2. Servizi tradizionali",
     "3. Clienti e Mercati",
     "4. Tecnologie",
     "5. Risorse Umane",
@@ -108,7 +108,9 @@ MAPPA_RD = {
 }
 
 TECNOLOGIE_OPZIONI = [
-    "AI",
+    "AI (ChatGPT, Gemini, ...)",
+    "AI (LLM locali)",
+    "AI (Integrazione Agenti AI)",
     "Blockchain",
     "Robotica",
     "Stampa 3D",

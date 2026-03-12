@@ -11,6 +11,8 @@ from reportlab.platypus import Image, PageBreak, Paragraph, SimpleDocTemplate, S
 from questionario_app.assessment import calcola_indici_assessment
 from questionario_app.constants import BLU_CONF, GRIGIO_TESTO, ETICHETTE_RISPOSTE, ORDINE_CHIAVI_REPORT
 
+OUTPUT_DIR = "generated_reports"
+
 
 def nome_file_sicuro(testo):
     testo = testo.lower().strip()
@@ -20,6 +22,11 @@ def nome_file_sicuro(testo):
 
 def etichetta_risposta(chiave):
     return ETICHETTE_RISPOSTE.get(chiave, chiave.replace("_", " ").capitalize())
+
+
+def ensure_output_dir():
+    os.makedirs(OUTPUT_DIR, exist_ok=True)
+    return OUTPUT_DIR
 
 
 def genera_radar_chart(indici_area, file_path="radar_chart.png"):
@@ -204,8 +211,9 @@ def _build_story_answers(story, styles, risposte):
 def genera_pdf_report(risposte):
     ragione_sociale = risposte.get("ragione_sociale", "impresa")
     nome_base = nome_file_sicuro(ragione_sociale)
-    file_path = f"report_valutazione_{nome_base}.pdf"
-    radar_path = f"radar_{nome_base}.png"
+    output_dir = ensure_output_dir()
+    file_path = os.path.join(output_dir, f"report_valutazione_{nome_base}.pdf")
+    radar_path = os.path.join(output_dir, f"radar_{nome_base}.png")
 
     risultati = calcola_indici_assessment(risposte)
     radar_generato = genera_radar_chart(risultati["indici_area"], radar_path)

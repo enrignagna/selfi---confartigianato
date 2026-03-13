@@ -4,7 +4,7 @@ import streamlit as st
 
 from questionario_app.assessment import calcola_indici_assessment
 from questionario_app.constants import BLU_CONF_HEX, PAGINE, SCALA_MATURITA, TECNOLOGIE_OPZIONI
-from questionario_app.reporting import ensure_output_dir, genera_pdf_report, genera_radar_chart
+from questionario_app.reporting import ensure_output_dir, genera_json_report, genera_pdf_report, genera_radar_chart
 
 
 def configure_page():
@@ -489,7 +489,7 @@ def render_report_finale(risposte):
         st.subheader("Radar di maturita digitale")
         st.image(radar_preview, width=600)
 
-    st.subheader("Report PDF")
+    st.subheader("Report esportabili")
     st.caption(f"I file generati vengono salvati in: `{output_dir}`")
     if st.button("Genera report PDF"):
         pdf_path = genera_pdf_report(risposte)
@@ -499,6 +499,16 @@ def render_report_finale(risposte):
                 data=file_handle.read(),
                 file_name=os.path.basename(pdf_path),
                 mime="application/pdf",
+            )
+
+    if st.button("Genera report JSON"):
+        json_path = genera_json_report(risposte)
+        with open(json_path, "rb") as file_handle:
+            st.download_button(
+                "Scarica report JSON",
+                data=file_handle.read(),
+                file_name=os.path.basename(json_path),
+                mime="application/json",
             )
 
 

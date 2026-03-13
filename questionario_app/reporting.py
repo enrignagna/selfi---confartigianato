@@ -1,6 +1,8 @@
+import json
 import math
 import os
 import re
+from datetime import datetime
 
 import matplotlib.pyplot as plt
 from reportlab.lib.pagesizes import A4
@@ -27,6 +29,37 @@ def etichetta_risposta(chiave):
 def ensure_output_dir():
     os.makedirs(OUTPUT_DIR, exist_ok=True)
     return OUTPUT_DIR
+
+
+def _ordered_answers(risposte):
+    ordered = {}
+
+    for chiave in ORDINE_CHIAVI_REPORT:
+        if chiave in risposte:
+            ordered[chiave] = risposte[chiave]
+
+    for chiave, valore in risposte.items():
+        if chiave not in ordered:
+            ordered[chiave] = valore
+
+    return ordered
+
+
+def build_report_payload(risposte):
+    ragione_sociale = risposte.get("ragione_sociale", "impresa")
+    nome_base = nome_file_sicuro(ragione_sociale)
+    risposte_ordinate = _ordered_answers(risposte)
+
+    return {
+        "metadata": {
+            "generated_at": datetime.now().astimezone().isoformat(timespec="seconds"),
+            "ragione_sociale": ragione_sociale,
+            "output_basename": nome_base,
+        },
+        "risultati": calcola_indici_assessment(risposte),
+        "risposte": risposte_ordinate,
+        "risposte_etichettate": {etichetta_risposta(chiave): valore for chiave, valore in risposte_ordinate.items()},
+    }
 
 
 def genera_radar_chart(indici_area, file_path="radar_chart.png"):
@@ -209,13 +242,14 @@ def _build_story_answers(story, styles, risposte):
 
 
 def genera_pdf_report(risposte):
-    ragione_sociale = risposte.get("ragione_sociale", "impresa")
-    nome_base = nome_file_sicuro(ragione_sociale)
+    payload = build_report_payload(risposte)
+    ragione_sociale = payload["metadata"]["ragione_sociale"]
+    nome_base = payload["metadata"]["output_basename"]
     output_dir = ensure_output_dir()
     file_path = os.path.join(output_dir, f"report_valutazione_{nome_base}.pdf")
     radar_path = os.path.join(output_dir, f"radar_{nome_base}.png")
 
-    risultati = calcola_indici_assessment(risposte)
+    risultati = payload["risultati"]
     radar_generato = genera_radar_chart(risultati["indici_area"], radar_path)
     doc = SimpleDocTemplate(
         file_path,
@@ -244,4 +278,16 @@ def genera_pdf_report(risposte):
         canvas.restoreState()
 
     doc.build(story, onFirstPage=footer, onLaterPages=footer)
+    return file_path
+
+
+def genera_json_report(risposte):
+    payload = build_report_payload(risposte)
+    nome_base = payload["metadata"]["output_basename"]
+    output_dir = ensure_output_dir()
+    file_path = os.path.join(output_dir, f"report_valutazione_{nome_base}.json")
+
+    with open(file_path, "w", encoding="utf-8") as file_handle:
+        json.dump(payload, file_handle, ensure_ascii=False, indent=2)
+
     return file_path
